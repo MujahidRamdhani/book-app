@@ -1,257 +1,120 @@
 # Book Tracker App
 
-A full-stack web application for managing your reading list, built with Flask and React. Build for People Recruitment Test. Integration with backend only works on page Library section Browse Library. Live preview on: https://book-app.cinte.id/
+A full-stack web application for managing your reading list, built with Flask and React.
 
-<img src="./assets/home.png" height="200" alt="Home">
-<img src="./assets/library.png" height="200" alt="Library">
+<p align="center">
+  <img src="./assets/home.png" height="200" alt="Home" />
+  <img src="./assets/library.png" height="200" alt="Library" />
+</p>
+
+## 📝 Submission Details
+
+This is the submission for the **Fullstack** role.
+
+- **Role**: Fullstack Engineer
+- **Features Implemented**:
+  - **Browse Library**: Complete CRUD (Create, Read, Update, Delete) functionality for books.
+  - **Backend API**: Robust REST API with Flask, structured using Controller-Service-Repository pattern.
+  - **Frontend Integration**: Linked React frontend with backend API using `axios` and `react-query` (tanstack query).
+  - **Validation**:
+    - Backend: Input validation using `marshmallow`/schemas.
+    - Frontend: Form validation using `zod` and `react-hook-form`.
+  - **CI/CD**: Added GitHub Actions workflows for both backend (testing) and frontend (linting/build).
+  - **UI/UX**: Enhanced UI with loading skeletons and error handling (using Shadcn UI).
+
+### How to Run/Test
+
+1. **Backend**:
+
+   ```bash
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # or venv\Scripts\activate on Windows
+   pip install -r requirements.txt
+   python app.py
+   ```
+
+   _Run Tests_: `pytest`
+
+2. **Frontend**:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+   _Run Linting_: `npm run lint`
+
+---
 
 ## Features
 
-- 📚 Add, view, update, and delete books
-- 📖 Track reading status (unread/reading/completed)
-- 🎨 Modern and responsive UI with Tailwind CSS
-- 🔄 Real-time updates
-- ⚡ Fast and efficient with React + Vite
-- 🛡️ Type-safe with TypeScript
+- 📚 **Book Management**: Add, view, update, and delete books.
+- 📖 **Tracking**: Track reading status (unread/reading/completed).
+- ⚡ **Modern Stack**: Built with React 18, Vite, and Flask.
+- 🎨 **Responsive Design**: Beautiful UI with Tailwind CSS and Shadcn Components.
+- 🛡️ **Type Safety**: TypeScript on the frontend.
+- 🏗️ **Clean Architecture**: Scalable backend structure.
 
 ## Tech Stack
 
 ### Backend
-- Python 3.x
-- Flask
-- Flask-CORS
-- SQLAlchemy
-- python-dotenv
+
+- **Core**: Python 3.x, Flask
+- **Database**: SQLAlchemy (SQLite)
+- **Architecture**: MVC (Controller-Service-Repository)
+- **Testing**: Pytest
 
 ### Frontend
-- React 18
-- TypeScript
-- Vite
-- Tailwind CSS
-- Axios
-- shadcn/ui components
 
-## Prerequisites
-
-- Python 3.x
-- Node.js 16.x or later
-- npm or yarn
-
-## Getting Started
-
-### Backend Setup
-
-1. Create and activate a virtual environment:
-```bash
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
-# On Windows:
-venv\Scripts\activate
-# On macOS/Linux:
-source venv/bin/activate
-```
-
-2. Install backend dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Start the Flask server:
-```bash
-cd backend
-python app.py
-```
-
-The backend server will start on http://localhost:5000
-
-### Frontend Setup
-
-1. Install frontend dependencies:
-```bash
-cd frontend
-npm install
-```
-
-2. Start the development server:
-```bash
-npm run dev
-```
-
-The frontend will be available at http://localhost:5173
-
-## API Documentation
-
-### Endpoints
-
-#### GET /api/books
-- Returns all books
-- Response: Array of book objects
-
-#### POST /api/books
-- Creates a new book
-- Request Body:
-```json
-{
-  "title": "string",
-  "author": "string",
-  "status": "unread" | "reading" | "completed"
-}
-```
-
-#### PUT /api/books/<id>
-- Updates an existing book
-- Request Body: Same as POST
-
-#### DELETE /api/books/<id>
-- Deletes a book by ID
+- **Core**: React 18, TypeScript, Vite
+- **Styling**: Tailwind CSS, Shadcn UI, Lucide Icons
+- **State/Fetching**: TanStack Query, Axios
+- **Forms**: React Hook Form, Zod
 
 ## Project Structure
 
 ```
 book-app/
 ├── backend/
-│   └── app.py              # Flask backend API
+│   ├── controllers/      # Request handlers (API Layer)
+│   ├── models/           # Database models
+│   ├── repositories/     # Data access logic
+│   ├── routes/           # Route definitions
+│   ├── schemas/          # Data validation schemas
+│   ├── services/         # Business logic
+│   ├── tests/            # Unit and integration tests
+│   └── app.py            # Entry point
 ├── frontend/
 │   ├── src/
-│   │   ├── types/
-│   │   │   └── book.ts     # TypeScript interfaces
-│   │   ├── services/
-│   │   │   └── api.ts      # API service functions
-│   │   ├── App.tsx         # Main React component
-│   │   ├── main.tsx        # React entry point
-│   │   └── index.css       # Global styles
-│   ├── tailwind.config.js  # Tailwind configuration
-│   └── package.json        # Frontend dependencies
-└── requirements.txt        # Backend dependencies
+│   │   ├── components/   # Reusable UI components
+│   │   ├── hooks/        # Custom React hooks
+│   │   ├── pages/        # Main page views
+│   │   ├── services/     # API integration functions
+│   │   ├── types/        # TypeScript type definitions
+│   │   └── App.tsx       # Main application component
+│   └── package.json
+└── .github/workflows/    # CI/CD pipelines
 ```
 
-## Development
+## API Documentation
 
-### Backend Development
-- The backend uses Flask for the API
-- CORS is enabled for frontend communication
-- Currently using in-memory storage (can be extended to use a database)
+### Book Endpoints
 
-### Frontend Development
-- Built with React + Vite for fast development
-- TypeScript for type safety
-- Tailwind CSS for styling
-- shadcn/ui components for consistent UI
+**Base URL**: `/api`
 
-## Contributing
+| Method   | Endpoint     | Description       | Body                        |
+| :------- | :----------- | :---------------- | :-------------------------- |
+| `GET`    | `/books`     | Get all books     | -                           |
+| `POST`   | `/books`     | Create a new book | `{ title, author, status }` |
+| `PUT`    | `/books/:id` | Update a book     | `{ title, author, status }` |
+| `DELETE` | `/books/:id` | Delete a book     | -                           |
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+## Prerequisites
 
-## Future Enhancements
-
-- [ ] Authentication system
-- [ ] Search and filtering
-- [ ] Sorting options
-- [ ] Book categories/tags
-- [ ] Reading progress tracking
-- [ ] Book ratings and reviews
-- [ ] Database integration
-- [ ] User profiles and personal libraries
+- Python 3.8+
+- Node.js 18+
+- npm or yarn
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-
-# Test Instruction
-
-Hi there! 👋  
-Thanks for applying to our company.
-
-This is a small take-home assignment where you'll contribute to a simple **Book Tracker App**.  
-You can choose how to contribute based on your strongest area: **Frontend, Backend, DevOps, QA, or Data**.
-
----
-
-## 🧭 Goal
-
-We want to see how you solve problems, write code, and structure your work — all in about **2–4 hours**.
-
----
-
-If you're applying for **DevOps**, **QA**, or **Data**, you can use the provided base code in the `backend/` or `frontend/` folders.
-
----
-
-## ✅ What to Do
-
-1. **Fork this repo** into your own GitHub account.
-2. **Pick ONE area** you're applying in:
-   - Frontend
-   - Backend
-   - DevOps
-   - QA
-   - Data
-   - Project/Product Manager
-   - UI/UX
-   - Customer Services
-3. **Work only in the part that fits your chosen role.**
-4. Push your code and include in your `README.md`:
-   - Your chosen role
-   - How to run/test your part
-   - Any notes or decisions you made
-5. Create a Pull Request (PR) to the main branch of this repository
-6. Share the PR link with us for review
-
----
-
-## 🔧 Tasks by Role
-
-Choose your role and follow the detailed task instructions:
-
-- [🔹 **Fullstack**](TASKS_FULLSTACK.md) - Complete Library Browse page features
-- [🔹 **Frontend**](TASKS_FRONTEND.md) - Build User Authentication, Settings, and Insight UIs
-- [🔹 **Backend**](TASKS_BACKEND.md) - Build REST API with search and filtering
-- [🔹 **DevOps**](TASKS_DEVOPS.md) - Create Dockerfiles and CI/CD workflows
-- [🔹 **QA**](TASKS_QA.md) - Create comprehensive test plans and execute testing
-- [🔹 **UI/UX**](TASKS_UIUX.md) - Design User Authentication and Settings pages
-- [🔹 **Project/Product Manager**](TASKS_PM.md) - Create project timelines and task breakdowns
-- [🔹 **Data Analytic Engineer**](TASKS_DATA.md) - Build data analytics solution and dashboard
-- [🔹 **Customer Service**](TASKS_CUSTOMER_SERVICE.md) - Create customer support system
-
----
-
-## 🌟 Bonus Points (Optional)
-
-We appreciate extra touches like:
-
-- ✅ Clean code structure / design pattern
-- ✅ Branching with meaningful commit history
-- ✅ README with clear instructions
-- ✅ Use of linters, formatters, or type checkers
-- ✅ Tests even if you're not applying for QA
-- ✅ CI workflow using GitHub Actions
-- ✅ UI polish, error handling, logging, etc.
-
----
-
-## 🕐 Timebox
-
-This should take around **2–4 hours**.  
-No need to overengineer — focus on clarity and your best work in a short time.
-
----
-
-## 📩 Submission
-
-Once you're done:
-1. Create a Pull Request (PR) to the main branch of this repository
-2. Share the PR link with us for review
-
-**Note**: We prefer PRs to the original repository rather than separate repo links, as this allows us to see your changes in context and review your contribution directly.
-
-Good luck, and have fun! 🚀
-
-
-
+MIT
