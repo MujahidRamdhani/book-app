@@ -21,6 +21,12 @@ This is the submission for the **Fullstack** role.
     - Frontend: Form validation using `zod` and `react-hook-form`.
   - **CI/CD**: Added GitHub Actions workflows for both backend (testing) and frontend (linting/build).
   - **UI/UX**: Enhanced UI with loading skeletons and error handling (using Shadcn UI).
+  - **Server-side Search & Filtering**: Implemented backend filtering for books by search term (title/author) and status logic, integrated into frontend with debounce.
+
+### Design Decisions
+
+- **Backend**: Implemented filtering in the Repository layer to keep the Service layer clean. `unread` status from API is mapped to `want-to-read` in the controller to maintain database compatibility without changing the contract.
+- **Frontend**: Utilized a debounced search input to minimize API calls. Replaced client-side filtering with server-side implementation while maintaining client-side genre filtering for sub-setting results. Added a Status dropdown next to the search bar for easy access.
 
 ### How to Run/Test
 
@@ -104,7 +110,7 @@ book-app/
 
 | Method   | Endpoint     | Description       | Body                        |
 | :------- | :----------- | :---------------- | :-------------------------- |
-| `GET`    | `/books`     | Get all books     | -                           |
+| `GET`    | `/books`     | Get all books     | Query: `search`, `status`   |
 | `POST`   | `/books`     | Create a new book | `{ title, author, status }` |
 | `PUT`    | `/books/:id` | Update a book     | `{ title, author, status }` |
 | `DELETE` | `/books/:id` | Delete a book     | -                           |

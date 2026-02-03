@@ -5,6 +5,11 @@ from marshmallow import ValidationError
 def index():
     search = request.args.get('search')
     status = request.args.get('status')
+    
+    # Map 'unread' to 'want-to-read' for database compatibility
+    if status == 'unread':
+        status = 'want-to-read'
+
     books = BookService.get_books(search, status)
     return jsonify(books), 200
 

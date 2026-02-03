@@ -1,4 +1,11 @@
-import { Search, Filter, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Search, Plus, Pencil, Trash2 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { AxiosError } from 'axios';
@@ -13,6 +20,7 @@ import BookCardSkeleton from './BookCardSkeleton';
 const BrowseLibrary = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +34,13 @@ const BrowseLibrary = () => {
   const fetchBooks = async () => {
     try {
       setLoading(true);
-      const response = await api.get<Book[]>('/api/books');
+      const params = new URLSearchParams();
+      if (searchTerm) params.append('search', searchTerm);
+      if (statusFilter && statusFilter !== 'all') {
+        params.append('status', statusFilter);
+      }
+
+      const response = await api.get<Book[]>('/api/books', { params });
       setBooks(response.data);
       setError(null);
     } catch (err: unknown) {
@@ -44,8 +58,12 @@ const BrowseLibrary = () => {
   };
 
   useEffect(() => {
-    fetchBooks();
-  }, []);
+    const timer = setTimeout(() => {
+      fetchBooks();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, statusFilter]);
 
   const handleDelete = async (book: Book) => {
     if (!window.confirm(`Are you sure you want to delete "${book.title}"?`)) return;
@@ -81,12 +99,11 @@ const BrowseLibrary = () => {
   // Get unique genres from books
   const genres = ['all', ...new Set(books.map(book => book.genre).filter(Boolean) as string[])];
   
-  // Filter books based on search term and selected genre
+  // Filter books based on selected genre (client-side)
+  // Search and Status are handled server-side
   const filteredBooks = books.filter(book => {
-    const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         book.author.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesGenre = selectedGenre === 'all' || book.genre === selectedGenre;
-    return matchesSearch && matchesGenre;
+    return matchesGenre;
   });
 
   if (loading) {
@@ -118,22 +135,32 @@ const BrowseLibrary = () => {
             <Button onClick={openCreateDialog} size="sm" className="bg-blue-600 hover:bg-blue-700">
                 <Plus className="h-4 w-4 mr-1" /> Add Book
             </Button>
-            <button className="p-2 text-gray-600 hover:text-gray-800 transition-colors">
-            <Filter size={20} />
-            </button>
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-3 top-3 text-gray-400" size={20} />
-        <Input
-          type="text"
-          placeholder="Search books or authors..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-6 bg-gray-100 rounded-xl border-none focus-visible:ring-2 focus-visible:ring-blue-500"
-        />
+      {/* Search Bar and Status Filter */}
+      <div className="flex gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-3 text-gray-400" size={20} />
+          <Input
+            type="text"
+            placeholder="Search books or authors..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-6 bg-gray-100 rounded-xl border-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          />
+        </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[180px] h-auto bg-gray-100 border-none rounded-xl">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="unread">Unread</SelectItem>
+            <SelectItem value="reading">Reading</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Genre Filter */}
