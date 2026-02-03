@@ -1,15 +1,41 @@
-import { useState } from 'react';
-import { Book, Search, User, TrendingUp, Plus, Library } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Book as BookIcon, Search, User, TrendingUp, Plus, Library } from 'lucide-react';
 import BookCard from '../components/BookCard';
 import ProgressCard from '../components/ProgressCard';
 import BottomNav from '../components/BottomNav';
 import HeaderNav from '../components/HeaderNav';
 import BrowseLibrary from '../components/BrowseLibrary';
-import { books, currentlyReading, readingStats } from '../data/dummyData';
+import { currentlyReading, readingStats } from '../data/dummyData';
+import api from '../services/api';
+import { Book } from '../types/book';
+import BookFormDialog from '../components/BookFormDialog';
+import BookCardSkeleton from '../components/BookCardSkeleton';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [libraryView, setLibraryView] = useState('my-books'); // 'my-books' or 'browse'
+  const [books, setBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+  const fetchBooks = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get<Book[]>('/api/books');
+      setBooks(response.data);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching books:', err);
+      setError('Failed to load library data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBooks();
+  }, []);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -19,14 +45,17 @@ const Index = () => {
             {/* Library Navigation */}
             <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
               <button
-                onClick={() => setLibraryView('my-books')}
+                onClick={() => {
+                  setLibraryView('my-books');
+                  fetchBooks();
+                }}
                 className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                   libraryView === 'my-books'
                     ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                <Book size={16} />
+                <BookIcon size={16} />
                 <span>My Books</span>
               </button>
               <button
@@ -48,17 +77,34 @@ const Index = () => {
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-bold text-gray-800">My Library</h2>
                   <button 
-                    onClick={() => setLibraryView('browse')}
+                    onClick={() => setIsCreateDialogOpen(true)}
                     className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors"
                   >
                     <Plus size={20} />
                   </button>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  {books.slice(0, 6).map((book) => (
-                    <BookCard key={book.id} book={book} variant="library" />
-                  ))}
-                </div>
+                
+                {loading ? (
+                    <div className="grid grid-cols-2 gap-4">
+                      {[...Array(6)].map((_, i) => (
+                        <BookCardSkeleton key={i} variant="library" />
+                      ))}
+                    </div>
+                ) : error ? (
+                    <div className="text-center py-8 text-red-500">
+                        {error}
+                    </div>
+                ) : books.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                        No books in your library yet.
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 gap-4">
+                    {books.map((book) => (
+                        <BookCard key={book.id} book={book} variant="library" />
+                    ))}
+                    </div>
+                )}
               </div>
             ) : (
               <BrowseLibrary />
@@ -77,17 +123,27 @@ const Index = () => {
               />
             </div>
             <h2 className="text-xl font-bold text-gray-800">Trending Now</h2>
-            <div className="space-y-3">
-              {books.slice(3, 8).map((book) => (
-                <BookCard key={book.id} book={book} variant="discover" />
-              ))}
-            </div>
+            
+            {loading ? (
+                 <div className="space-y-3">
+                   {[...Array(5)].map((_, i) => (
+                     <BookCardSkeleton key={i} variant="discover" />
+                   ))}
+                 </div>
+            ) : (
+                <div className="space-y-3">
+                {books.slice(0, 5).map((book) => (
+                    <BookCard key={book.id} book={book} variant="discover" />
+                ))}
+                </div>
+            )}
           </div>
         );
       case 'reading':
         return (
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-gray-800">Currently Reading</h2>
+             {/* Note: keeping dummy data for currently reading as configured in prompt request to only update library */}
             <div className="space-y-4">
               {currentlyReading.map((book) => (
                 <ProgressCard key={book.id} book={book} />
@@ -144,11 +200,19 @@ const Index = () => {
 
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-3">Recommended for You</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {books.slice(0, 4).map((book) => (
-                  <BookCard key={book.id} book={book} variant="compact" />
-                ))}
-              </div>
+              {loading ? (
+                   <div className="grid grid-cols-2 gap-3">
+                     {[...Array(4)].map((_, i) => (
+                       <BookCardSkeleton key={i} variant="compact" />
+                     ))}
+                   </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                    {books.slice(0, 4).map((book) => (
+                    <BookCard key={book.id} book={book} variant="compact" />
+                    ))}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -164,6 +228,12 @@ const Index = () => {
       </main>
 
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      
+      <BookFormDialog 
+        open={isCreateDialogOpen} 
+        onOpenChange={setIsCreateDialogOpen} 
+        onSuccess={fetchBooks} 
+      />
     </div>
   );
 };

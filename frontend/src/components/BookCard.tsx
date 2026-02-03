@@ -1,16 +1,7 @@
 
 import { Star, BookOpen, Clock } from 'lucide-react';
 
-interface Book {
-  id: number;
-  title: string;
-  author: string;
-  cover: string;
-  rating: number;
-  pages: number;
-  genre: string;
-  status: 'read' | 'reading' | 'want-to-read';
-}
+import { Book } from '../types/book';
 
 interface BookCardProps {
   book: Book;
@@ -45,11 +36,11 @@ const BookCard = ({ book, variant = 'default' }: BookCardProps) => {
             <BookOpen className="text-green-500" size={28} />
           </div>
           <div className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium ${
-            book.status === 'read' ? 'bg-green-100 text-green-700' :
+            book.status === 'completed' ? 'bg-green-100 text-green-700' :
             book.status === 'reading' ? 'bg-blue-100 text-blue-700' :
             'bg-gray-100 text-gray-700'
           }`}>
-            {book.status === 'read' ? 'Read' : book.status === 'reading' ? 'Reading' : 'Want to Read'}
+            {book.status === 'completed' ? 'Completed' : book.status === 'reading' ? 'Reading' : 'Want to Read'}
           </div>
         </div>
         <div className="p-3">
@@ -78,9 +69,11 @@ const BookCard = ({ book, variant = 'default' }: BookCardProps) => {
             <h3 className="font-semibold text-gray-800 mb-1 line-clamp-2">{book.title}</h3>
             <p className="text-sm text-gray-600 mb-2">{book.author}</p>
             <div className="flex items-center justify-between">
-              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                {book.genre}
-              </span>
+              {book.genre && (
+                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+                  {book.genre}
+                </span>
+              )}
               <div className="flex items-center text-sm text-gray-500">
                 <Star size={14} className="text-yellow-400 mr-1" />
                 {book.rating}

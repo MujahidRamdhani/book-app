@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Get API configuration from environment variables
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5001';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT || '10000');
 const IS_DEBUG = import.meta.env.VITE_ENABLE_DEBUG === 'true';
 

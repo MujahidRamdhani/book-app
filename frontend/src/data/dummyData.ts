@@ -8,7 +8,7 @@ export const books = [
     rating: 4.2,
     pages: 180,
     genre: "Classic",
-    status: "read" as const
+    status: "completed" as const
   },
   {
     id: 2,
@@ -18,7 +18,7 @@ export const books = [
     rating: 4.8,
     pages: 376,
     genre: "Fiction",
-    status: "read" as const
+    status: "completed" as const
   },
   {
     id: 3,
@@ -48,7 +48,7 @@ export const books = [
     rating: 3.8,
     pages: 277,
     genre: "Coming-of-age",
-    status: "read" as const
+    status: "completed" as const
   },
   {
     id: 6,
@@ -58,7 +58,7 @@ export const books = [
     rating: 4.7,
     pages: 309,
     genre: "Fantasy",
-    status: "read" as const
+    status: "completed" as const
   },
   {
     id: 7,
