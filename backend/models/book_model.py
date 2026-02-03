@@ -8,7 +8,7 @@ class Book(db.Model):
     title = db.Column(db.String(255), nullable=False)
     author = db.Column(db.String(255), nullable=False)
     cover = db.Column(db.String(255), nullable=True) # Optional URL
-    rating = db.Column(db.Integer, default=0) # Range 0-5
+    rating = db.Column(db.Float, default=0.0) # Range 0-5
     pages = db.Column(db.Integer, nullable=True)
     genre = db.Column(db.String(100), nullable=True)
     status = db.Column(db.Enum('want-to-read', 'reading', 'completed', name='book_status'), default='want-to-read', nullable=False)
